@@ -7,6 +7,7 @@ import org.openkinect.processing.*;
 Kinect k;
 int kw = 640; //kinect width
 int kh = 480; //kinect height 
+int angle = 20;
 
 //for each kinect depth value, we calculate the value in meters 
 //and store it in an array 
@@ -27,6 +28,9 @@ void setup(){
   k.start();
   k.enableDepth(true);
   k.processDepthImage(false);
+  
+  //enable tilt control 
+  k.tilt(angle);
   
   //set windowsize 
   size(displayWidth, displayHeight, P3D);
@@ -49,7 +53,7 @@ void setup(){
 void draw(){
   
   background(0);
-  
+
   int[] rawDepthArray = k.getRawDepth();
   
   //traslation and rotation should happen here
@@ -78,8 +82,28 @@ void draw(){
     }
   }
   
+    
+  //display kinect tilt
+  fill(255);
+  text("Kinect Angle: " + angle, 20, 20);
+  
+  
   //Rotate
   a += 0.02f;
+}
+
+//get keyboard input to adjust kinect angle
+void keyPressed(){
+  if(key == CODED){
+    if(key == UP){
+      angle++;
+    }else if(key == DOWN){
+      angle--;
+    }
+    //make sure kinect angle doesn't go beyond border 
+    angle = constrain(angle, 0, 30);
+    k.tilt(angle);
+  }
 }
 
 
