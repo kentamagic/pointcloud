@@ -36,6 +36,11 @@ int res = 5;
 float a = 0;
 
 //timer set-up
+//all in millisec
+int startTime;
+int clearTime = 50000;
+int fontTime = 50000;
+int captureTime = 50000;
 
 
 void setup(){
@@ -44,8 +49,8 @@ void setup(){
   smooth();
   frameRate(30);
   
-  //setup timer 
-  
+  //
+  startTime = millis();
   
   //initialize fisica world
   Fisica.init(this);
@@ -81,13 +86,6 @@ void setup(){
   
 }
 
-//ideas
-//1. gradually, the point-cloud starts building 
-//2. the rotation axis changes 
-//3. color changes 
-//4. study translation!!!
-
-
 void draw(){
   
   background(0);
@@ -97,6 +95,20 @@ void draw(){
 //  world.draw(this);  
 //  
   int[] rawDepthArray = k.getRawDepth();
+  
+  int timePassed = millis() - startTime;
+  if((timePassed%clearTime) == 0){
+    //change font
+    //capture
+    try{
+      saveFrame("screenshot.png");
+    }catch(Exception e){
+    }
+    //clear
+    world.clear();
+    world.setEdges(this, color(255));
+    world.remove(world.top);
+  }
   
   
   //print the letters
@@ -110,7 +122,7 @@ void draw(){
   //and rotate! 
   rotateY(a);
 
-  //
+  //create a dot (or not) for each pixel 
   for(int x=0; x<kw; x=x+res){
     for(int y=0; y<kh; y=y+res){
       int index;
@@ -169,9 +181,6 @@ PVector mapDepth(int x, int y, int depthValue) {
   return result;
 }
 //=======================================================================
-
-
-
 //get the character from keyboard input
 void keyPressed() {  
   FChar chr = new FChar(key);
@@ -180,12 +189,13 @@ void keyPressed() {
     world.add(chr);
   }
 
-//  if (key == ' ') {
-//    world.clear();
-//    //world.setEdges(this, color(255));
-//    //world.remove(world.top);
-//    posX = 0;
-//  }
+  //space just moves the posX in the positive direction by 10px
+  if (key == ' ') {
+    //world.clear();
+    //world.setEdges(this, color(255));
+    //world.remove(world.top);
+    posX += 10;
+  }
 
  try {
     if (keyCode==CONTROL) {
@@ -195,8 +205,8 @@ void keyPressed() {
   catch (Exception e) {
   }
 }
-
-
+//=========================================================================
+//stop code 
 void stop() {
   k.quit();
   super.stop();
