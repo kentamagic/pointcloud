@@ -31,15 +31,21 @@ float posX = 0; //this is the initial x-pos of the place letters fall
 RFont font;
 
 //set resolution of point cloud 
-int res = 4;
+int res = 5;
 //set Rotation value 
 float a = 0;
+
+//timer set-up
+
 
 void setup(){
   
   size(1280,800,P3D);
   smooth();
   frameRate(30);
+  
+  //setup timer 
+  
   
   //initialize fisica world
   Fisica.init(this);
@@ -50,7 +56,7 @@ void setup(){
   RG.setPolygonizer(RG.ADAPTATIVE);
   
   world = new FWorld();
-  world.setGravity(0, 400);
+  world.setGravity(0, 800);
   world.setEdges(this, color(0));
   //not sure if I need this but...
   world.remove(world.top);
@@ -65,7 +71,7 @@ void setup(){
   k.processDepthImage(false);
   
   //set windowsize 
-  size(displayWidth, displayHeight, P3D);
+  //size(displayWidth, displayHeight, P3D);
   
   //set conversionTable 
   //each values from 0 to 2047 corresponds to a meter value 
@@ -86,17 +92,23 @@ void draw(){
   
   background(0);
   
+//  //print the letters
+//  fill(255);
+//  world.draw(this);  
+//  
+  int[] rawDepthArray = k.getRawDepth();
+  
+  
   //print the letters
   fill(255);
-  world.draw(this);  
+  world.draw(this);
   
-  int[] rawDepthArray = k.getRawDepth();
   
   //traslation and rotation should happen here
   //adjust the size of the virtual point cloud within the screen 
-  translate(width/2,height/2,-1000);
+  translate(width/2,height/2,-150);
   //and rotate! 
-  //rotateY(a);
+  rotateY(a);
 
   //
   for(int x=0; x<kw; x=x+res){
@@ -106,21 +118,29 @@ void draw(){
       int rawDepth = rawDepthArray[index];
       float meterDepth = conversionTable[rawDepth];
       
-      if(meterDepth <= 1.0){
+      if(meterDepth <= 1.5){
         PVector v = mapDepth(x, y, rawDepth);
         pushMatrix();
         float scale = 800;
         translate(v.x*scale,v.y*scale,scale-v.z*scale);
+        
         stroke(255);
         point(0,0);
+
+//        FCircle dot = new FCircle(1);
+//        dot.setPosition(0, 0);
+//        dot.setFillColor(0,0,0);
+//        dot.setNoStroke();        
+        
+        
+        
         popMatrix(); 
-      
       }
     }
-  }
+  }  
   
   //Rotate
-  a += 0.02f;
+  a += 0.01f;
   world.step();
 }
 
@@ -148,6 +168,9 @@ PVector mapDepth(int x, int y, int depthValue) {
   result.z = (float)(depth);
   return result;
 }
+//=======================================================================
+
+
 
 //get the character from keyboard input
 void keyPressed() {  
@@ -157,14 +180,14 @@ void keyPressed() {
     world.add(chr);
   }
 
-  if (key == ' ') {
-    world.clear();
-    //world.setEdges(this, color(255));
-    //world.remove(world.top);
-    posX = 0;
-  }
+//  if (key == ' ') {
+//    world.clear();
+//    //world.setEdges(this, color(255));
+//    //world.remove(world.top);
+//    posX = 0;
+//  }
 
-  try {
+ try {
     if (keyCode==CONTROL) {
       saveFrame("screenshot.png");
     }
