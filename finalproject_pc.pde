@@ -39,9 +39,16 @@ float a = 0;
 //all in millisec
 int startTime;
 int clearTime = 50000;
-int fontTime = 50000;
-int captureTime = 50000;
+//int fontTime = 50000;
+//int captureTime = 50000;
 
+int z = 1;
+
+
+//font array
+String[] fontArray = {"Times-RomanSC.ttf", "LiberationSerif-Bold.ttf"};
+int fontCount = 0;
+int fontIndex;
 
 void setup(){
   
@@ -49,7 +56,7 @@ void setup(){
   smooth();
   frameRate(30);
   
-  //
+  //start timer 
   startTime = millis();
   
   //initialize fisica world
@@ -66,7 +73,9 @@ void setup(){
   //not sure if I need this but...
   world.remove(world.top);
   
-  font = RG.loadFont("LiberationSerif-Bold.ttf");
+  fontIndex = fontCount % 2;
+  String fontType = fontArray[fontIndex];
+  font = RG.loadFont(fontType);
   
   
   //start kinect
@@ -89,28 +98,10 @@ void setup(){
 void draw(){
   
   background(0);
-  
-//  //print the letters
-//  fill(255);
-//  world.draw(this);  
-//  
+
   int[] rawDepthArray = k.getRawDepth();
   
-  int timePassed = millis() - startTime;
-  if((timePassed%clearTime) == 0){
-    //change font
-    //capture
-    try{
-      saveFrame("screenshot.png");
-    }catch(Exception e){
-    }
-    //clear
-    world.clear();
-    world.setEdges(this, color(255));
-    world.remove(world.top);
-  }
-  
-  
+    
   //print the letters
   fill(255);
   world.draw(this);
@@ -138,14 +129,6 @@ void draw(){
         
         stroke(255);
         point(0,0);
-
-//        FCircle dot = new FCircle(1);
-//        dot.setPosition(0, 0);
-//        dot.setFillColor(0,0,0);
-//        dot.setNoStroke();        
-        
-        
-        
         popMatrix(); 
       }
     }
@@ -153,7 +136,27 @@ void draw(){
   
   //Rotate
   a += 0.01f;
+  //update
   world.step();
+  
+//  //TIMER ========================================================
+//  //currently not working
+//  //check time, and clear letters/take screenshot if necessary 
+//  int timePassed = millis() - startTime;
+//  if((timePassed%clearTime) == 0){
+//    //change font
+//    //capture
+//    try{
+//      saveFrame("screenshot.png");
+//    }catch(Exception e){
+//    }
+//    //clear
+//    world.clear();
+//    world.setEdges(this, color(255));
+//    world.remove(world.top);
+//  }  
+//  //===============================================================
+  
 }
 
 
@@ -189,23 +192,33 @@ void keyPressed() {
     world.add(chr);
   }
 
-  //space just moves the posX in the positive direction by 10px
+  //space just moves the posX in the positive direction by 10px (also it clears the space)
   if (key == ' ') {
-    //world.clear();
-    //world.setEdges(this, color(255));
-    //world.remove(world.top);
-    posX += 10;
+    world.clear();
+    world.setEdges(this, color(0));
+    world.remove(world.top);
+    posX += 15;
+  }
+  
+  //ENTER key changes fonts!
+  if(key == ENTER){
+    fontCount++;
+    fontIndex = fontCount % 2;
+    String fontType = fontArray[fontIndex];
+    font = RG.loadFont(fontType);    
   }
 
  try {
     if (keyCode==CONTROL) {
-      saveFrame("screenshot.png");
+      saveFrame("screenshot"+ z + ".png");
+      z++;
     }
   } 
   catch (Exception e) {
   }
 }
 //=========================================================================
+
 //stop code 
 void stop() {
   k.quit();
