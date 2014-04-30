@@ -46,13 +46,19 @@ int z = 1;
 
 
 //font array
-String[] fontArray = {"Times-RomanSC.ttf", "LiberationSerif-Bold.ttf"};
+String[] fontArray = {"Times-RomanSC.ttf", "LiberationSerif-Bold.ttf", "Swiss721BT-LightItalic.ttf"};
 int fontCount = 0;
 int fontIndex;
 
+//import SoundCipher
+import arb.soundcipher.*;
+//set up new SoundCipher 
+SoundCiper sound = new SoundCipher(this);
+
+
 void setup(){
   
-  size(1280,800,P3D);
+  size(2000,1080,P3D);
   smooth();
   frameRate(30);
   
@@ -73,7 +79,7 @@ void setup(){
   //not sure if I need this but...
   world.remove(world.top);
   
-  fontIndex = fontCount % 2;
+  fontIndex = fontCount % fontArray.length;
   String fontType = fontArray[fontIndex];
   font = RG.loadFont(fontType);
   
@@ -109,7 +115,7 @@ void draw(){
   
   //traslation and rotation should happen here
   //adjust the size of the virtual point cloud within the screen 
-  translate(width/2,height/2,-150);
+  translate(width/2,height/2,-50);
   //and rotate! 
   rotateY(a);
 
@@ -140,7 +146,8 @@ void draw(){
   world.step();
   
 //  //TIMER ========================================================
-//  //currently not working
+//  //currently not working but it ocationally work when I'm not exhibiting my work 
+//  // it is something to do with the "present" mode of processing that disables this feature on my code 
 //  //check time, and clear letters/take screenshot if necessary 
 //  int timePassed = millis() - startTime;
 //  if((timePassed%clearTime) == 0){
@@ -188,27 +195,30 @@ PVector mapDepth(int x, int y, int depthValue) {
 void keyPressed() {  
   FChar chr = new FChar(key);
   
+  //play sound
+  sound.playNote(key - 45, 100, 0.5);
+  
   if (chr.isCreated()) {
     world.add(chr);
   }
 
   //space just moves the posX in the positive direction by 10px (also it clears the space)
-  if (key == ' ') {
+  if (key == BACKSPACE) {
     world.clear();
     world.setEdges(this, color(0));
     world.remove(world.top);
-    posX += 15;
   }
   
   //ENTER key changes fonts!
   if(key == ENTER){
     fontCount++;
-    fontIndex = fontCount % 2;
+    fontIndex = fontCount % fontArray.length;
     String fontType = fontArray[fontIndex];
     font = RG.loadFont(fontType);    
   }
 
- try {
+  //CONTROL key takes a screenshot 
+  try{
     if (keyCode==CONTROL) {
       saveFrame("screenshot"+ z + ".png");
       z++;
@@ -216,6 +226,7 @@ void keyPressed() {
   } 
   catch (Exception e) {
   }
+  
 }
 //=========================================================================
 
