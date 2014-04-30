@@ -195,7 +195,7 @@ PVector mapDepth(int x, int y, int depthValue) {
 void keyPressed() {  
   FChar chr = new FChar(key);
   
-  //play sound
+  //play sound upon detecting keyPressed 
   sound.playNote(key - 45, 100, 0.5);
   
   if (chr.isCreated()) {
